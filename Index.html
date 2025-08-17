@@ -1,40 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>BugBounty PoC - Clipboard, MIDI, EME</title>
+  <title>EME Fingerprint PoC</title>
 </head>
 <body>
-  <h2>BugBounty PoC</h2>
-  <p>Test otomatis 3 API: Clipboard, MIDI, dan EME</p>
+  <h2>Encrypted Media Extensions Fingerprinting PoC</h2>
+  <p>Cek DRM key system apa aja yang didukung browser kamu.</p>
+  <pre id="output"></pre>
 
   <script>
-    // 1. Clipboard Write Test
-    navigator.clipboard.writeText("Hacked by Arya - PoC Clipboard")
-      .then(() => {
-        console.log("✅ Clipboard overwritten tanpa prompt");
-        alert("✅ Clipboard berhasil di-overwrite! Coba CTRL+V");
-      })
-      .catch(err => {
-        console.log("❌ Clipboard gagal:", err);
-      });
+    const output = document.getElementById("output");
 
-    // 2. MIDI API Test (with sysex)
-    if (navigator.requestMIDIAccess) {
-      navigator.requestMIDIAccess({ sysex: true })
-        .then(midi => {
-          console.log("✅ MIDI Access:", midi);
-          alert("✅ Bisa akses MIDI + SysEx tanpa izin");
-        })
-        .catch(err => {
-          console.log("❌ MIDI gagal:", err);
-        });
-    } else {
-      console.log("MIDI API not supported");
+    // List of common DRM key systems
+    const keySystems = [
+      "com.widevine.alpha",     // Google Widevine (Chrome/Edge/Brave)
+      "com.microsoft.playready",// Microsoft PlayReady (Edge/IE)
+      "org.w3.clearkey",        // ClearKey (default open spec)
+      "com.apple.fps.1_0"       // Apple FairPlay (Safari)
+    ];
+
+    async function testKeySystem(keySystem) {
+      try {
+        const access = await navigator.requestMediaKeySystemAccess(keySystem, [{
+          initDataTypes: ["cenc"],
+          videoCapabilities: [{ contentType: 'video/mp4; codecs="avc1.42E01E"' }]
+        }]);
+        log(`✅ ${keySystem} tersedia`);
+      } catch (err) {
+        log(`❌ ${keySystem} tidak tersedia (${err.message})`);
+      }
     }
 
-    // 3. EME Test (Widevine / DRM)
+    function log(msg) {
+      console.log(msg);
+      output.textContent += msg + "\n";
+    }
+
     if (navigator.requestMediaKeySystemAccess) {
-      navigator.requestMediaKeySystemAccess("com.widevine.alpha", [{
+      keySystems.forEach(ks => testKeySystem(ks));
+    } else {
+      log("Browser tidak mendukung EME API");
+    }
+  </script>
+</body>
+</html>      navigator.requestMediaKeySystemAccess("com.widevine.alpha", [{
         initDataTypes: ["cenc"],
         videoCapabilities: [{ contentType: "video/mp4; codecs=\"avc1.42E01E\"" }]
       }])
