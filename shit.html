@@ -91,12 +91,10 @@
         ctx.fillText("Next", 180, 220);
       }, 500);
 
-      try {
-        await video.requestPictureInPicture();
-      } catch (err) {
-        alert("PiP not supported: " + err);
-      }
-    }
+video.onloadedmetadata = async () => {
+  await video.play();
+  await video.requestPictureInPicture();
+};
   </script>
 </body>
 </html>
