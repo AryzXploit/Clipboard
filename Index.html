@@ -1,62 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <title>EME Fingerprint PoC</title>
+  <meta charset="UTF-8">
+  <title>EME Fingerprinting PoC</title>
+  <style>
+    body { font-family: monospace; background:#111; color:#eee; padding:20px; }
+    table { border-collapse: collapse; margin-top:20px; }
+    th, td { border:1px solid #666; padding:6px 10px; }
+    th { background:#222; }
+    .ok { color: #0f0; }
+    .fail { color: #f33; }
+  </style>
 </head>
 <body>
   <h2>Encrypted Media Extensions Fingerprinting PoC</h2>
-  <p>Cek DRM key system apa aja yang didukung browser kamu.</p>
-  <pre id="output"></pre>
+  <p>Browser ini dukung keySystem & codec apa aja tanpa permission.</p>
+  <table id="results">
+    <thead>
+      <tr><th>KeySystem</th><th>Codec</th><th>Status</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
   <script>
-    const output = document.getElementById("output");
-
-    // List of common DRM key systems
     const keySystems = [
-      "com.widevine.alpha",     // Google Widevine (Chrome/Edge/Brave)
-      "com.microsoft.playready",// Microsoft PlayReady (Edge/IE)
-      "org.w3.clearkey",        // ClearKey (default open spec)
-      "com.apple.fps.1_0"       // Apple FairPlay (Safari)
+      "com.widevine.alpha",
+      "com.microsoft.playready",
+      "org.w3.clearkey",
+      "com.apple.fps.1_0"
     ];
 
-    async function testKeySystem(keySystem) {
-      try {
-        const access = await navigator.requestMediaKeySystemAccess(keySystem, [{
-          initDataTypes: ["cenc"],
-          videoCapabilities: [{ contentType: 'video/mp4; codecs="avc1.42E01E"' }]
-        }]);
-        log(`✅ ${keySystem} tersedia`);
-      } catch (err) {
-        log(`❌ ${keySystem} tidak tersedia (${err.message})`);
+    const codecs = [
+      'video/mp4; codecs="avc1.42E01E"',
+      'video/mp4; codecs="avc1.58A01E"',
+      'video/webm; codecs="vp8"',
+      'video/webm; codecs="vp9"',
+      'video/mp4; codecs="av01.0.05M.08"'
+    ];
+
+    const tbody = document.querySelector("#results tbody");
+
+    async function checkEME() {
+      if (!navigator.requestMediaKeySystemAccess) {
+        document.body.innerHTML += "<p>❌ EME API not supported</p>";
+        return;
+      }
+
+      for (const ks of keySystems) {
+        for (const codec of codecs) {
+          const config = [{
+            initDataTypes: ["cenc"],
+            videoCapabilities: [{ contentType: codec }]
+          }];
+
+          try {
+            const access = await navigator.requestMediaKeySystemAccess(ks, config);
+            const row = `<tr><td>${ks}</td><td>${codec}</td><td class="ok">✅ Supported</td></tr>`;
+            tbody.innerHTML += row;
+          } catch (e) {
+            const row = `<tr><td>${ks}</td><td>${codec}</td><td class="fail">❌ Not supported</td></tr>`;
+            tbody.innerHTML += row;
+          }
+        }
       }
     }
 
-    function log(msg) {
-      console.log(msg);
-      output.textContent += msg + "\n";
-    }
-
-    if (navigator.requestMediaKeySystemAccess) {
-      keySystems.forEach(ks => testKeySystem(ks));
-    } else {
-      log("Browser tidak mendukung EME API");
-    }
-  </script>
-</body>
-</html>      navigator.requestMediaKeySystemAccess("com.widevine.alpha", [{
-        initDataTypes: ["cenc"],
-        videoCapabilities: [{ contentType: "video/mp4; codecs=\"avc1.42E01E\"" }]
-      }])
-      .then(keySystemAccess => {
-        console.log("✅ EME Access:", keySystemAccess.keySystem);
-        alert("✅ EME terdeteksi: " + keySystemAccess.keySystem);
-      })
-      .catch(err => {
-        console.log("❌ EME gagal:", err);
-      });
-    } else {
-      console.log("EME API not supported");
-    }
+    checkEME();
   </script>
 </body>
 </html>
