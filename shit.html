@@ -1,80 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Opera PiP Spoof Demo</title>
+  <meta charset="UTF-8">
+  <title>Google Sign-In</title>
   <style>
-    body { font-family: Arial, sans-serif; }
-    button {
-      padding: 8px 12px;
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      background: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 360px;
+      margin: 30px auto;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 40px 30px;
+      text-align: center;
+    }
+    .logo {
+      margin-bottom: 20px;
+    }
+    .logo img {
+      width: 75px;
+    }
+    h2 {
+      font-size: 22px;
+      font-weight: 400;
+      margin: 0 0 20px;
+      color: #202124;
+    }
+    .input-field {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    .input-field input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      font-size: 14px;
+      outline: none;
+    }
+    .input-field input:focus {
+      border-color: #1a73e8;
+      box-shadow: 0 0 2px #1a73e8;
+    }
+    .btn {
+      width: 100%;
       background: #1a73e8;
       color: #fff;
+      font-weight: 500;
       border: none;
       border-radius: 4px;
+      padding: 10px;
+      font-size: 14px;
       cursor: pointer;
-      margin: 20px;
+    }
+    .btn:hover {
+      background: #1669c1;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #5f6368;
+    }
+    .footer a {
+      color: #1a73e8;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <h2>Opera PiP Spoof Demo</h2>
-  <button onclick="launchFake()">Launch Fake Google Login</button>
-
-  <video id="pip-video" style="display:none;" playsinline></video>
-
-  <script>
-    async function launchFake() {
-      let video = document.getElementById('pip-video');
-      let canvas = document.createElement('canvas');
-      canvas.width = 400;
-      canvas.height = 300;
-      let ctx = canvas.getContext('2d');
-
-      // Stream canvas ke video
-      let stream = canvas.captureStream();
-      video.srcObject = stream;
-
-      // Gambar fake login UI
-      setInterval(() => {
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(0,0,400,300);
-
-        // Fake address bar
-        ctx.fillStyle = "green";
-        ctx.font = "14px Arial";
-        ctx.fillText("🔒 https://accounts.google.com", 10, 20);
-
-        // Title
-        ctx.fillStyle = "black";
-        ctx.font = "16px Arial bold";
-        ctx.fillText("Sign in", 160, 60);
-
-        // Input labels
-        ctx.font = "14px Arial";
-        ctx.fillText("Email or phone:", 20, 100);
-        ctx.fillText("Password:", 20, 150);
-
-        // Fake input boxes
-        ctx.strokeStyle = "#ccc";
-        ctx.strokeRect(150, 85, 200, 25);
-        ctx.strokeRect(150, 135, 200, 25);
-
-        // Fake button
-        ctx.fillStyle = "#1a73e8";
-        ctx.fillRect(150, 200, 100, 30);
-        ctx.fillStyle = "#fff";
-        ctx.fillText("Next", 180, 220);
-      }, 500);
-
-      // Tunggu metadata siap, baru PiP
-      video.onloadedmetadata = async () => {
-        await video.play();
-        try {
-          await video.requestPictureInPicture();
-        } catch (err) {
-          alert("PiP not supported: " + err);
-        }
-      };
-    }
-  </script>
+  <div class="container">
+    <div class="logo">
+      <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_92x30dp.png" alt="Google">
+    </div>
+    <h2>Sign in</h2>
+    <form>
+      <div class="input-field">
+        <input type="text" placeholder="Email or phone" required>
+      </div>
+      <div class="input-field">
+        <input type="password" placeholder="Enter your password" required>
+      </div>
+      <button type="submit" class="btn">Next</button>
+    </form>
+    <div class="footer">
+      <p><a href="#">Forgot email?</a></p>
+      <p>Not your computer? Use Guest mode to sign in privately. <a href="#">Learn more</a></p>
+    </div>
+  </div>
 </body>
 </html>
