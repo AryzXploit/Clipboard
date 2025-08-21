@@ -1,19 +1,62 @@
 <!DOCTYPE html>
 <html>
-  <body>
-    <h1>PoC - Steal Data from commonApi</h1>
-    <script>
-      try {
-        alert("Consent: " + window.commonApi.getConsentString());
-      } catch (e) {
-        alert("Error (consent): " + e);
-      }
+<head>
+  <title>API Call Logger</title>
+</head>
+<body>
+  <h2>Monitoring API Calls</h2>
+  <pre id="log"></pre>
 
-      try {
-        alert("URL: " + window.commonApi.getUrl());
-      } catch (e) {
-        alert("Error (url): " + e);
+  <script>
+    function log(msg) {
+      document.getElementById("log").textContent += msg + "\n";
+      console.log(msg);
+    }
+
+    // Hook Clipboard
+    if (navigator.clipboard) {
+      ["writeText", "readText"].forEach(fn => {
+        if (navigator.clipboard[fn]) {
+          navigator.clipboard[fn] = new Proxy(navigator.clipboard[fn], {
+            apply(target, thisArg, args) {
+              log("[Clipboard] " + fn + " called with: " + JSON.stringify(args));
+              return Reflect.apply(target, thisArg, args);
+            }
+          });
+        }
+      });
+    }
+
+    // Hook Notification
+    if (window.Notification) {
+      const orig = Notification.requestPermission;
+      Notification.requestPermission = function(...args) {
+        log("[Notification] requestPermission called");
+        return orig.apply(this, args);
       }
-    </script>
-  </body>
+    }
+
+    // Hook getUserMedia
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      const orig = navigator.mediaDevices.getUserMedia;
+      navigator.mediaDevices.getUserMedia = function(...args) {
+        log("[MediaDevices] getUserMedia called with: " + JSON.stringify(args));
+        return orig.apply(this, args);
+      }
+    }
+
+    // Hook geolocation
+    if (navigator.geolocation) {
+      ["getCurrentPosition","watchPosition"].forEach(fn => {
+        const orig = navigator.geolocation[fn];
+        navigator.geolocation[fn] = function(...args) {
+          log("[Geo] " + fn + " called");
+          return orig.apply(this, args);
+        }
+      });
+    }
+
+    log("✅ API hook aktif. Tunggu kalau ada call masuk...");
+  </script>
+</body>
 </html>
