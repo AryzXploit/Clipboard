@@ -1,69 +1,19 @@
 <!doctype html>
 <meta charset="utf-8">
-<body>
-<h1>Redirecting to Google...</h1>
-<script>
-setTimeout(()=>{
-  location.href = "https://www.google.com";
-},1000);
-
-setTimeout(()=>{
-  try {
-    var t = typeof window.miui;
-    if (t === 'object') <!doctype html>
-<meta charset="utf-8">
 <script>
 (function(){
   function safeAlert(msg){
     try { alert(msg); } catch(e){ console.log("alert err", e); }
   }
 
-  try {
-    var t = typeof window.miui;
-    if (t === 'object') {
-      // list keys
-      var keys = [];
-      for (var k in window.miui) {
-        try { keys.push(k); } catch(e){ keys.push(k + "(err)"); }
-      }
-      safeAlert('miui object, keys: ' + keys.join(', '));
-
-      // Try calling common safe getters if exist
-      var tries = [];
-      try {
-        if (typeof window.miui.getLanguage === 'function') {
-          tries.push('getLanguage() => ' + window.miui.getLanguage());
-        }
-      } catch(e){ tries.push('getLanguage threw: '+e); }
-
-      try {
-        if (typeof window.miui.getRegion === 'function') {
-          tries.push('getRegion() => ' + window.miui.getRegion());
-        }
-      } catch(e){ tries.push('getRegion threw: '+e); }
-
-      try {
-        if (typeof window.miui.getAppId === 'function') {
-          tries.push('getAppId() => ' + window.miui.getAppId());
-        }
-      } catch(e){ tries.push('getAppId threw: '+e); }
-
-      safeAlert(tries.join('\n'));
-      console.log("miui keys:", keys, "tries:", tries);
-    } else {
-      safeAlert('miui: ' + t);
+  if (typeof window.miui === 'object') {
+    let keys = [];
+    for (let k in window.miui) {
+      keys.push(k);
     }
-  } catch (err) {
-    safeAlert('err: ' + err);
+    safeAlert("miui object exposed! Keys:\n" + keys.join(", "));
+  } else {
+    safeAlert("window.miui not found");
   }
 })();
 </script>
-      var keys = Object.keys(window.miui);
-      alert("STILL HERE @google.com !!\nkeys: " + keys.join(", "));
-    } else {
-      alert("miui gone: " + t);
-    }
-  } catch(e){ alert("err: "+e); }
-},3000);
-</script>
-</body>
