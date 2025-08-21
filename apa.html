@@ -2,16 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Indirect UXSS Simulation</title>
+<title>Indirect UXSS Simulation - Upgraded</title>
 <script>
-function triggerUXSS() {
-    // Ambil iframe yang sudah "loaded"
-    const target = document.getElementById('victimFrame');
+// Fungsi trigger UXSS
+function triggerIndirectUXSS(encodedPayload) {
+    const iframe = document.getElementById('victimFrame');
 
-    // Simulasi indirect UXSS: inject JS ke iframe via src (payload)
-    // Di browser normal, ini cuma bisa ke iframe same-origin
+    // Decode payload (simulate double encoding like %250d)
+    const payload = decodeURIComponent(encodedPayload);
+
     try {
-        target.contentWindow.eval("alert('Indirect UXSS triggered!')");
+        // Set src ke javascript: payload
+        iframe.src = payload; // alert akan muncul jika iframe about:blank (same-origin)
     } catch (e) {
         console.warn('Cannot execute script: Same-origin policy blocked it');
     }
@@ -19,14 +21,20 @@ function triggerUXSS() {
 </script>
 </head>
 <body>
-<h1>Indirect UXSS Simulation</h1>
+<h1>Indirect UXSS Simulation - Upgraded</h1>
 
 <!-- Simulasi page yang udah terbuka -->
 <iframe id="victimFrame" src="about:blank" width="600" height="300"></iframe>
 
 <br><br>
-<button onclick="triggerUXSS()" style="padding:20px;font-size:20px;">Trigger Indirect UXSS</button>
+<!-- Anchor link mirip deeplink -->
+<a href="#" onclick="triggerIndirectUXSS('javascript%3Aalert(%27Indirect%20UXSS%20Triggered!%27)')"
+   style="padding:15px; font-size:18px; background-color:#4CAF50; color:white; text-decoration:none;">
+   Trigger Indirect UXSS
+</a>
 
-<p>Note: Di browser, payload cuma bisa ke iframe sama-origin. Di Android integrated browser, bisa ke page yg udah loaded via deeplink.</p>
+<p>
+Note: Di browser normal, payload cuma bisa ke iframe same-origin. Di Android integrated browser, ini mirip behavior deeplink dengan double encoding.
+</p>
 </body>
 </html>
