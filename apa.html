@@ -1,62 +1,48 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>API Call Logger</title>
-</head>
-<body>
-  <h2>Monitoring API Calls</h2>
-  <pre id="log"></pre>
+<!doctype html>
+<meta charset="utf-8">
+<script>
+(function(){
+  function safeAlert(msg){
+    try { alert(msg); } catch(e){ console.log("alert err", e); }
+  }
 
-  <script>
-    function log(msg) {
-      document.getElementById("log").textContent += msg + "\n";
-      console.log(msg);
-    }
-
-    // Hook Clipboard
-    if (navigator.clipboard) {
-      ["writeText", "readText"].forEach(fn => {
-        if (navigator.clipboard[fn]) {
-          navigator.clipboard[fn] = new Proxy(navigator.clipboard[fn], {
-            apply(target, thisArg, args) {
-              log("[Clipboard] " + fn + " called with: " + JSON.stringify(args));
-              return Reflect.apply(target, thisArg, args);
-            }
-          });
-        }
-      });
-    }
-
-    // Hook Notification
-    if (window.Notification) {
-      const orig = Notification.requestPermission;
-      Notification.requestPermission = function(...args) {
-        log("[Notification] requestPermission called");
-        return orig.apply(this, args);
+  try {
+    var t = typeof window.miui;
+    if (t === 'object') {
+      // list keys
+      var keys = [];
+      for (var k in window.miui) {
+        try { keys.push(k); } catch(e){ keys.push(k + "(err)"); }
       }
-    }
+      safeAlert('miui object, keys: ' + keys.join(', '));
 
-    // Hook getUserMedia
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      const orig = navigator.mediaDevices.getUserMedia;
-      navigator.mediaDevices.getUserMedia = function(...args) {
-        log("[MediaDevices] getUserMedia called with: " + JSON.stringify(args));
-        return orig.apply(this, args);
-      }
-    }
-
-    // Hook geolocation
-    if (navigator.geolocation) {
-      ["getCurrentPosition","watchPosition"].forEach(fn => {
-        const orig = navigator.geolocation[fn];
-        navigator.geolocation[fn] = function(...args) {
-          log("[Geo] " + fn + " called");
-          return orig.apply(this, args);
+      // Try calling common safe getters if exist
+      var tries = [];
+      try {
+        if (typeof window.miui.getLanguage === 'function') {
+          tries.push('getLanguage() => ' + window.miui.getLanguage());
         }
-      });
-    }
+      } catch(e){ tries.push('getLanguage threw: '+e); }
 
-    log("✅ API hook aktif. Tunggu kalau ada call masuk...");
-  </script>
-</body>
-</html>
+      try {
+        if (typeof window.miui.getRegion === 'function') {
+          tries.push('getRegion() => ' + window.miui.getRegion());
+        }
+      } catch(e){ tries.push('getRegion threw: '+e); }
+
+      try {
+        if (typeof window.miui.getAppId === 'function') {
+          tries.push('getAppId() => ' + window.miui.getAppId());
+        }
+      } catch(e){ tries.push('getAppId threw: '+e); }
+
+      safeAlert(tries.join('\n'));
+      console.log("miui keys:", keys, "tries:", tries);
+    } else {
+      safeAlert('miui: ' + t);
+    }
+  } catch (err) {
+    safeAlert('err: ' + err);
+  }
+})();
+</script>
