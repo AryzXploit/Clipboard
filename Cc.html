@@ -1,16 +1,14 @@
 <!doctype html>
 <meta charset="utf-8">
+<title>PoC JS Injection</title>
+<h3>PoC JS injection test</h3>
+<p>Open with param ?q=PAYLOAD</p>
 <script>
 (function(){
-  try {
-    if (typeof window.miui === "object") {
-      // non-destructive attempts (no console/UI text)
-      try { window.miui.setStatusBarColor && window.miui.setStatusBarColor("#FF0000", true); } catch(e){}
-      try { window.miui.showUrlBar && window.miui.showUrlBar(false); } catch(e){}
-      try { window.miui.getLanguage && window.miui.getLanguage(); } catch(e){}
-      try { window.miui.getRegion && window.miui.getRegion(); } catch(e){}
-      // NOTE: no network/exfiltration and no DOM writes
-    }
-  } catch(e){}
+  // prints location so you can craft injection in native code
+  document.body.appendChild(document.createElement('pre')).textContent =
+    "location: " + location.href + "\n" +
+    "hash: " + location.hash + "\n" +
+    "search: " + location.search;
 })();
 </script>
