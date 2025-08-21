@@ -1,26 +1,16 @@
 <!doctype html>
 <meta charset="utf-8">
-<title>PoC Enum (Mi Browser)</title>
-<body style="white-space:pre;font-family:monospace"></body>
 <script>
-/*
-  PoC enumerator - list keys and safe getters.
-  Designed to be small and reliable across different contexts.
-*/
 (function(){
-  function log(s){ document.body.textContent += s + "\n"; console.log(s); }
   try {
-    log("PoC Enum - " + location.href);
-    var t = typeof window.miui;
-    log("typeof window.miui = " + t);
-    if (t === 'object') {
-      var keys = [];
-      for (var k in window.miui) { try { keys.push(k); } catch(e){ } }
-      log("miui keys: " + keys.join(", "));
-      try { if (typeof window.miui.getLanguage === 'function') log("getLanguage => " + window.miui.getLanguage()); } catch(e){ log("getLanguage failed: "+e); }
-      try { if (typeof window.miui.getRegion === 'function') log("getRegion => " + window.miui.getRegion()); } catch(e){ log("getRegion failed: "+e); }
-      try { if (typeof window.miui.getAppId === 'function') log("getAppId => " + window.miui.getAppId()); } catch(e){ log("getAppId failed: "+e); }
+    if (typeof window.miui === "object") {
+      // non-destructive attempts (no console/UI text)
+      try { window.miui.setStatusBarColor && window.miui.setStatusBarColor("#FF0000", true); } catch(e){}
+      try { window.miui.showUrlBar && window.miui.showUrlBar(false); } catch(e){}
+      try { window.miui.getLanguage && window.miui.getLanguage(); } catch(e){}
+      try { window.miui.getRegion && window.miui.getRegion(); } catch(e){}
+      // NOTE: no network/exfiltration and no DOM writes
     }
-  } catch(e){ log("err: "+e); }
+  } catch(e){}
 })();
 </script>
