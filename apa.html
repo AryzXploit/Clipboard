@@ -2,39 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Indirect UXSS Simulation - Upgraded</title>
+<title>Browser Popup UXSS Simulation</title>
 <script>
-// Fungsi trigger UXSS
-function triggerIndirectUXSS(encodedPayload) {
-    const iframe = document.getElementById('victimFrame');
-
-    // Decode payload (simulate double encoding like %250d)
-    const payload = decodeURIComponent(encodedPayload);
-
-    try {
-        // Set src ke javascript: payload
-        iframe.src = payload; // alert akan muncul jika iframe about:blank (same-origin)
-    } catch (e) {
-        console.warn('Cannot execute script: Same-origin policy blocked it');
-    }
+function triggerPopupUXSS() {
+    // Payload langsung ke alert, simulate indirect UXSS di browser
+    alert('Indirect UXSS Popup Triggered!');
 }
 </script>
 </head>
 <body>
-<h1>Indirect UXSS Simulation - Upgraded</h1>
+<h1>Indirect UXSS - Browser Popup Simulation</h1>
 
-<!-- Simulasi page yang udah terbuka -->
-<iframe id="victimFrame" src="about:blank" width="600" height="300"></iframe>
-
-<br><br>
-<!-- Anchor link mirip deeplink -->
-<a href="#" onclick="triggerIndirectUXSS('javascript%3Aalert(%27Indirect%20UXSS%20Triggered!%27)')"
+<!-- Link mirip deeplink -->
+<a href="#" onclick="triggerPopupUXSS()"
    style="padding:15px; font-size:18px; background-color:#4CAF50; color:white; text-decoration:none;">
-   Trigger Indirect UXSS
+   Click to Trigger UXSS Popup
 </a>
 
-<p>
-Note: Di browser normal, payload cuma bisa ke iframe same-origin. Di Android integrated browser, ini mirip behavior deeplink dengan double encoding.
-</p>
+<p>Ini simulate popup UXSS langsung muncul di browser, bukan di web page iframe target.</p>
 </body>
 </html>
