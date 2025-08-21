@@ -1,24 +1,26 @@
-<!doctype html><meta charset="utf-8">
+<!doctype html>
+<meta charset="utf-8">
+<title>PoC Enum (Mi Browser)</title>
 <body style="white-space:pre;font-family:monospace"></body>
 <script>
+/*
+  PoC enumerator - list keys and safe getters.
+  Designed to be small and reliable across different contexts.
+*/
 (function(){
   function log(s){ document.body.textContent += s + "\n"; console.log(s); }
   try {
-    log("domain: " + location.href);
-    if (typeof window.miui === 'object') {
-      log("[+] miui exposed");
-      for (var k in window.miui) log(" - " + k + " : " + typeof window.miui[k]);
-      try { log("getLanguage: " + (window.miui.getLanguage && window.miui.getLanguage())); } catch(e){ log("getLanguage err " + e); }
-      try { log("getRegion: " + (window.miui.getRegion && window.miui.getRegion())); } catch(e){ log("getRegion err " + e); }
-
-      // UI manip test (non-destructive):
-      try { window.miui.setStatusBarColor("#00FF00", true); log("setStatusBarColor called"); } catch(e){ log("setStatusBarColor err "+e); }
-      try { window.miui.showUrlBar(false); log("showUrlBar(false) called"); } catch(e){ log("showUrlBar err "+e); }
-    } else {
-      log("[-] miui not found");
+    log("PoC Enum - " + location.href);
+    var t = typeof window.miui;
+    log("typeof window.miui = " + t);
+    if (t === 'object') {
+      var keys = [];
+      for (var k in window.miui) { try { keys.push(k); } catch(e){ } }
+      log("miui keys: " + keys.join(", "));
+      try { if (typeof window.miui.getLanguage === 'function') log("getLanguage => " + window.miui.getLanguage()); } catch(e){ log("getLanguage failed: "+e); }
+      try { if (typeof window.miui.getRegion === 'function') log("getRegion => " + window.miui.getRegion()); } catch(e){ log("getRegion failed: "+e); }
+      try { if (typeof window.miui.getAppId === 'function') log("getAppId => " + window.miui.getAppId()); } catch(e){ log("getAppId failed: "+e); }
     }
-  } catch(err){
-    log("fatal err: "+err);
-  }
+  } catch(e){ log("err: "+e); }
 })();
 </script>
