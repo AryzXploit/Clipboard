@@ -2,40 +2,56 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>CSP Bypass Fuzzer - Opera GX</title>
+  <title>CSP Bypass Payload Dump</title>
 </head>
 <body>
 <h2>CSP Bypass Testing - Opera GX</h2>
 
-<script>
-// list payload
-const tests = [
-  {name: "Inline Script", code: `<script>alert('inline')</script>`},
-  {name: "Event Handler", code: `<img src=x onerror="alert('onerror')">`},
-  {name: "Data URI", code: `<script src="data:text/javascript,alert('data-uri')"></script>`},
-  {name: "Blob URI", code: `<script>
-      var blob = new Blob(["alert('blob')"], {type: 'application/javascript'});
-      var url = URL.createObjectURL(blob);
-      var s = document.createElement('script'); s.src = url; document.body.appendChild(s);
-    </script>`},
-  {name: "Iframe srcdoc", code: `<iframe srcdoc="<script>alert('iframe-srcdoc')<\/script>"></iframe>`},
-  {name: "Iframe sandbox allow-scripts", code: `<iframe sandbox="allow-scripts" srcdoc="<script>alert('iframe-sandbox')<\/script>"></iframe>`},
-  {name: "Meta CSP override", code: `<meta http-equiv="Content-Security-Policy" content="script-src * 'unsafe-inline' 'unsafe-eval' data: blob:;"> <script>alert('meta-csp')</script>`},
-  {name: "JavaScript URL", code: `<a href="javascript:alert('js-url')">Click JS URL</a>`},
-  {name: "Inline SVG with onload", code: `<svg onload="alert('svg-onload')"></svg>`},
-  {name: "Object tag", code: `<object data="data:text/html,<script>alert('object')</script>"></object>`},
-  {name: "Embed tag", code: `<embed src="data:text/html,<script>alert('embed')</script>">`},
-  {name: "Video track", code: `<video><track src="data:text/html,<script>alert('video-track')</script>"></video>`},
-  {name: "Base64 data URI", code: `<script src="data:text/javascript;base64,YWxlcnQoJ2Jhc2U2NCcp"></script>`}
-];
+<h3>Inline Script</h3>
+<script>alert('inline')</script>
 
-// render
-tests.forEach(t => {
-  const container = document.createElement("div");
-  container.innerHTML = `<h3>${t.name}</h3>` + t.code;
-  document.body.appendChild(container);
-});
+<h3>Event Handler</h3>
+<img src=x onerror="alert('onerror')">
+
+<h3>Data URI</h3>
+<script src="data:text/javascript,alert('data-uri')"></script>
+
+<h3>Blob URI</h3>
+<script>
+var blob = new Blob(["alert('blob')"], {type: 'application/javascript'});
+var url = URL.createObjectURL(blob);
+var s = document.createElement('script'); 
+s.src = url; 
+document.body.appendChild(s);
 </script>
+
+<h3>Iframe srcdoc</h3>
+<iframe srcdoc="<script>alert('iframe-srcdoc')<\/script>"></iframe>
+
+<h3>Iframe sandbox allow-scripts</h3>
+<iframe sandbox="allow-scripts" srcdoc="<script>alert('iframe-sandbox')<\/script>"></iframe>
+
+<h3>Meta CSP override</h3>
+<meta http-equiv="Content-Security-Policy" content="script-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
+<script>alert('meta-csp')</script>
+
+<h3>JavaScript URL</h3>
+<a href="javascript:alert('js-url')">Click JS URL</a>
+
+<h3>Inline SVG with onload</h3>
+<svg onload="alert('svg-onload')"></svg>
+
+<h3>Object tag</h3>
+<object data="data:text/html,<script>alert('object')</script>"></object>
+
+<h3>Embed tag</h3>
+<embed src="data:text/html,<script>alert('embed')</script>">
+
+<h3>Video track</h3>
+<video><track src="data:text/html,<script>alert('video-track')</script>"></video>
+
+<h3>Base64 data URI</h3>
+<script src="data:text/javascript;base64,YWxlcnQoJ2Jhc2U2NCcp"></script>
 
 </body>
 </html>
