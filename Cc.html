@@ -13,7 +13,28 @@
       try {
         // kirim pesan ke interface "DokobitListener"
         DokobitListener.postMessage(
-          JSON.stringify({
+          JSON.stringify({<!DOCTYPE html>
+<html>
+<head>
+  <title>Opera GX Query Hiding PoC</title>
+</head>
+<body>
+  <h2>Opera GX Query Hiding Test</h2>
+  <p>
+    <a href="https://example.com/login?redirect=https://evil.com" target="_blank">
+      Klik disini untuk Login
+    </a>
+  </p>
+
+  <script>
+    // Auto redirect pake query param
+    setTimeout(() => {
+      window.location = "https://example.com/login?redirect=https://evil.com";
+    }, 2000);
+  </script>
+</body>
+</html>
+
             message: "logout",
             note: "PoC test from JS"
           })
